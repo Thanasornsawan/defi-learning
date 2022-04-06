@@ -57,10 +57,11 @@ async function main() {
       console.log(`Admin DAI Balance: ${unlockedBalance}`);
       console.log(`Recipient DAI Balance: ${recipientBalance}`);
     
-      const resp = await admin.sendTransaction({
+      await admin.sendTransaction({
         to: recipientAddress,
         value: ethers.utils.parseEther('1.0'),
       });
+      
       console.log("after transfer ETH to recipient");
       await hre.network.provider.request({
         method: "hardhat_impersonateAccount",
@@ -82,7 +83,7 @@ async function main() {
       .send({from: unlockedAddress}); 
       */   
     
-    await myDefi.connect(admin).borrow();
+    //await myDefi.connect(admin).borrow();
    
 }
 
