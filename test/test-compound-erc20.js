@@ -1,7 +1,6 @@
 const { assert } = require('chai');
 const { ethers } = require("hardhat");
 const { time } = require("@openzeppelin/test-helpers");
-const BN = require("bn.js");
 const { sendEther, pow } = require("../utils.js");
 const { DAI, DAI_WHALE, CDAI, WBTC, WBTC_WHALE, CWBTC } = require("../config.js");
 const { web3 } = require("@openzeppelin/test-helpers/src/setup");
