@@ -48,7 +48,7 @@ contract TestCompoundErc20 {
     return (cTokenBal * exchangeRate) / 10**(18 + decimals - cTokenDecimals);
   }
 
-  // not view function
+  // not view function balanceOfUnderlying func is same estimateBalanceOfUnderlying func. It's built-in function
   function balanceOfUnderlying() external returns (uint) {
     return cToken.balanceOfUnderlying(address(this));
   }
