@@ -30,7 +30,7 @@ contract TestCompoundErc20 {
     return cToken.balanceOf(address(this));
   }
 
-  // not view function but we can get data by static call ->contract.getInfo.call()
+  // not view function but we can get data by static call ->contract.callStatic.getInfo()
   function getInfo() external returns (uint exchangeRate, uint supplyRate) {
     // Amount of current exchange rate from cToken to underlying
     exchangeRate = cToken.exchangeRateCurrent();
