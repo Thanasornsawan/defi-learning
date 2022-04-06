@@ -6,18 +6,13 @@ const batAbi = require('../build/batAbi.json');
 const cDaiAbi = require('../build/cDaiAbi.json');
 const cBatAbi = require('../build/cBatAbi.json');
 const compTrollerAbi = require('../build/compTrollerAbi.json');
-const daiAdress = '0x6B175474E89094C44Da98b954EedeAC495271d0F';
-const batAddress = '0x0D8775F648430679A709E98d2b0Cb6250d2887EF';
-const cDaiAddress = '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643';
-const cBatAddress = '0x6C8c6b02E7b2BE14d4fA6022Dfd6d75921D90E4E';
-const compTrollerAddress = '0x374ABb8cE19A73f2c4EFAd642bda76c797f19233';
+const { DAI, DAI_WHALE, CDAI, BAT, CBAT, COMP_CONTROLLER } = require("../config");
 
-const dai = new web3.eth.Contract(daiAbi,daiAdress);
-const bat = new web3.eth.Contract(batAbi,batAddress);
-const cDai = new web3.eth.Contract(cDaiAbi,cDaiAddress);
-const cBat = new web3.eth.Contract(cBatAbi,cBatAddress);
-const compTroller = new web3.eth.Contract(compTrollerAbi,compTrollerAddress);
-const unlockedAddress = '0x56178a0d5f301baf6cf3e1cd53d9863437345bf9';
+const dai = new web3.eth.Contract(daiAbi,DAI);
+const bat = new web3.eth.Contract(batAbi,BAT);
+const cDai = new web3.eth.Contract(cDaiAbi,CDAI);
+const cBat = new web3.eth.Contract(cBatAbi,CBAT);
+const compTroller = new web3.eth.Contract(compTrollerAbi,COMP_CONTROLLER);
 
 async function main() {
 
@@ -30,25 +25,30 @@ async function main() {
   let recipientAddress = await web3.eth.getAccounts().then( function (result) { return result[0] });
   console.log("my Wallet address:", recipientAddress);
   
+  //impersonate to be DAI WHALE account and sign
   await hre.network.provider.request({
     method: "hardhat_impersonateAccount",
-    params: [unlockedAddress],
+    params: [DAI_WHALE],
   });
-    const admin = hre.ethers.provider.getSigner(unlockedAddress);
+    const admin = hre.ethers.provider.getSigner(DAI_WHALE);
+    //////////////////////////////////////////////////////
+
     console.log("before transfer ETH to recipient");
-    let borrower_balance = await web3.eth.getBalance(unlockedAddress);
+
+    let borrower_balance = await web3.eth.getBalance(DAI_WHALE);
     let borrower_ethBalance = web3.utils.fromWei(borrower_balance, 'ether')
     console.log("ETH balance of admin : ", borrower_ethBalance); //9.704160744297630164
 
     let my_balance = await web3.eth.getBalance(recipientAddress);
     let my_ethBalance = web3.utils.fromWei(my_balance, 'ether')
     console.log("ETH balance of my wallet : ", my_ethBalance);
-   
+
+    //Check amount of DAI in DAI WHALE   
     let unlockedBalance, recipientBalance;
     ([unlockedBalance, recipientBalance] = await Promise.all
       ([
         dai.methods
-          .balanceOf(unlockedAddress)
+          .balanceOf(DAI_WHALE)
           .call (),
         dai.methods
           .balanceOf(recipientAddress)
@@ -57,19 +57,15 @@ async function main() {
       console.log(`Admin DAI Balance: ${unlockedBalance}`);
       console.log(`Recipient DAI Balance: ${recipientBalance}`);
     
+      //test impersonate account can work fine by use admin to transfer money to our account (admin = DAI_WHALE)
       await admin.sendTransaction({
         to: recipientAddress,
         value: ethers.utils.parseEther('1.0'),
       });
       
       console.log("after transfer ETH to recipient");
-      await hre.network.provider.request({
-        method: "hardhat_impersonateAccount",
-        params: [recipientAddress],
-      });
-      const recipient = hre.ethers.provider.getSigner(recipientAddress);
 
-    borrower_balance = await web3.eth.getBalance(unlockedAddress);
+    borrower_balance = await web3.eth.getBalance(DAI_WHALE);
     borrower_ethBalance = web3.utils.fromWei(borrower_balance, 'ether')
     console.log("ETH balance of admin : ", borrower_ethBalance);
 
@@ -77,10 +73,10 @@ async function main() {
     my_ethBalance = web3.utils.fromWei(my_balance, 'ether')
     console.log("ETH balance of my wallet : ", my_ethBalance); 
 
-      /*
+      /* test transfer DAI from DAI_WHALE  to our account
       await dai.methods
       .transfer(recipientAddress, 1000)
-      .send({from: unlockedAddress}); 
+      .send({from: DAI_WHALE}); 
       */   
     
     //await myDefi.connect(admin).borrow();
