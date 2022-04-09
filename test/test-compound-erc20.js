@@ -8,7 +8,7 @@ const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 let DEPOSIT_AMOUNT = pow(10, 8) //100000000
 DEPOSIT_AMOUNT = (DEPOSIT_AMOUNT).toNumber();
 
-describe("test compound", function () {
+describe("test compound supply and redeem", function () {
   const WHALE = WBTC_WHALE
   const TOKEN = WBTC
   const C_TOKEN = CWBTC
@@ -46,7 +46,7 @@ describe("test compound", function () {
     }
 
     it("should supply and redeem", async function () {
-      //impersonate to be DAI WHALE account and sign
+      //impersonate to be WBTC WHALE account and sign
       await hre.network.provider.request({
         method: "hardhat_impersonateAccount",
         params: [WHALE],

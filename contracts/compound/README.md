@@ -26,6 +26,10 @@ terminal 1: run command `npm run fork`
 
 ![console1](https://github.com/Thanasornsawan/defi-learning/blob/main/contracts/compound/photo/test2.jpg)
 
-terminal 2: run command `npx hardhat test ./test/test-compound-erc20.js --network localhost`
+terminal 2: run command `npx hardhat test ./test/test-compound-erc20.js --network localhost` for test supply and redeem.
 
 ![console2](https://github.com/Thanasornsawan/defi-learning/blob/main/contracts/compound/photo/test.jpg)
+
+terminal 2: run command `npx hardhat test test/test-compound-erc20-borrow.js --network localhost`
+
+![console3](https://github.com/Thanasornsawan/defi-learning/blob/main/contracts/compound/photo/test3.jpg)

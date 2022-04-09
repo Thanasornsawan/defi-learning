@@ -4,10 +4,10 @@ pragma solidity ^0.8;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/compound.sol";
 
-// supply
-// borrow
-// repay
-// redeem
+// supply = transfer asset into compound and get back as cToken
+// borrow = borrow another token from the max supply you have
+// repay = rapay token that you borrow
+// redeem = withdraw token you supply
 
 contract TestCompoundErc20 {
   IERC20 public token;
@@ -20,12 +20,19 @@ contract TestCompoundErc20 {
     cToken = CErc20(_cToken);
   }
 
+  //approve contract and transfer token to contract and then approve cToken to allow mint token
+  /* Description from compound doc https://compound.finance/docs/ctokens
+  The mint function transfers an asset into the protocol,
+  which begins accumulating interest based on "the current Supply Rate" for the asset.
+  The user receives a quantity of cTokens equal to the underlying tokens supplied, 
+  divided by "the current Exchange Rate".
+  */
   function supply(uint _amount) external {
     token.transferFrom(msg.sender, address(this), _amount);
     token.approve(address(cToken), _amount);
     require(cToken.mint(_amount) == 0, "mint failed");
   }
-
+  //Verify cToken after mint
   function getCTokenBalance() external view returns (uint) {
     return cToken.balanceOf(address(this));
   }
@@ -38,7 +45,7 @@ contract TestCompoundErc20 {
     supplyRate = cToken.supplyRatePerBlock();
   }
 
-  // not view function
+  // not view function (when redeem base on exchange rate only)
   function estimateBalanceOfUnderlying() external returns (uint) {
     uint cTokenBal = cToken.balanceOf(address(this));
     uint exchangeRate = cToken.exchangeRateCurrent();
@@ -48,11 +55,19 @@ contract TestCompoundErc20 {
     return (cTokenBal * exchangeRate) / 10**(18 + decimals - cTokenDecimals);
   }
 
-  // not view function balanceOfUnderlying func is same estimateBalanceOfUnderlying func. It's built-in function
+  // not view function 
+  //balanceOfUnderlying func is same estimateBalanceOfUnderlying func. It's built-in function
+  //a quantity of cTokens = balanceOfUnderlying
   function balanceOfUnderlying() external returns (uint) {
     return cToken.balanceOfUnderlying(address(this));
   }
 
+  /* from compound doc
+  The redeem function converts a specified quantity of cTokens into the underlying asset, 
+  and returns them to the user. The amount of underlying tokens received is equal to 
+  the quantity of cTokens redeemed, multiplied by the current Exchange Rate. 
+  The amount redeemed must be less than the user's Account Liquidity and the market's available liquidity.
+  */
   function redeem(uint _cTokenAmount) external {
     require(cToken.redeem(_cTokenAmount) == 0, "redeem failed");
     // cToken.redeemUnderlying(underlying amount);
@@ -64,7 +79,11 @@ contract TestCompoundErc20 {
 
   PriceFeed public priceFeed = PriceFeed(0x922018674c12a7F0D394ebEEf9B58F186CdE13c1);
 
-  // collateral
+  /* collateral use for calculate percentage of supply that you put in contract
+  bool isListed = Is the cToken recognized by controller?
+  bool isComped = Is the cToken going to get compound reward token call comp?
+  uint colFactor is the percentage from the value divide by 1e18 that we want
+  */
   function getCollateralFactor() external view returns (uint) {
     (bool isListed, uint colFactor, bool isComped) = comptroller.markets(
       address(cToken)
