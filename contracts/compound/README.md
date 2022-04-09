@@ -32,4 +32,4 @@ terminal 2: run command `npx hardhat test ./test/test-compound-erc20.js --networ
 
 terminal 2: run command `npx hardhat test test/test-compound-erc20-borrow.js --network localhost`
 
-![console3](https://github.com/Thanasornsawan/defi-learning/blob/main/contracts/compound/photo/test3.jpg)
+![console3](https://github.com/Thanasornsawan/defi-learning/blob/main/contracts/compound/photo/test3.JPG)
